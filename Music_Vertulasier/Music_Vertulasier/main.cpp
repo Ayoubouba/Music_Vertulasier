@@ -5,6 +5,8 @@
 #include "audio_cupture.h"
 
 #include <vector>
+#include "audio_processor.h"
+#include "cuda_runtime.h"
 
 
 
@@ -105,5 +107,26 @@ int main() {
 
     std::cout << "Program completed successfully!\n";
     // Dummy allocation to check CUDA setup
+	std::cout << "Allocating dummy CUDA memory...\n";
+
+    // Create test data
+
+        const int bufferSize = 1024;
+        std::vector<float> input(bufferSize, 0.5f); // Fill with 0.5
+        std::vector<float> output(bufferSize, 0.0f);
+
+        AudioProcessor processor(bufferSize);
+        if (!processor.initialize()) return 1;
+		std::cout << "AudioProcessor initialized successfully!\n";
+        processor.process(input.data(), output.data(), bufferSize);
+
+        // Verify output now contains 0.5 (copied from input)
+        std::cout << "First 5 output values: ";
+        for (int i = 0; i < 5; i++) {
+            std::cout << output[i] << " "; // Should print "0.5 0.5 0.5 0.5 0.5"
+        }
+        std::cout << std::endl;
+
+
     return 0;
 }

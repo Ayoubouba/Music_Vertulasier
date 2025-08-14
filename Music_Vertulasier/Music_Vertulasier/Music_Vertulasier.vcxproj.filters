@@ -7,6 +7,9 @@
     <Filter Include="utils">
       <UniqueIdentifier>{de8c6110-cc4b-49d5-9657-98a454ee4fd7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Cuda">
+      <UniqueIdentifier>{cfe8250d-4477-4121-844d-6fb7b093d21d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="audio_cupture.cpp">
@@ -20,5 +23,13 @@
     <ClInclude Include="config.h">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="audio_processor.h">
+      <Filter>Cuda</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="audio_processor.cu">
+      <Filter>Cuda</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

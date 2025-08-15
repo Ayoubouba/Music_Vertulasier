@@ -15,6 +15,7 @@
     <ClCompile Include="audio_cupture.cpp">
       <Filter>audio</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="audio_cupture.h">
@@ -25,6 +26,9 @@
     </ClInclude>
     <ClInclude Include="audio_processor.h">
       <Filter>Cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="pinned_buffer.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

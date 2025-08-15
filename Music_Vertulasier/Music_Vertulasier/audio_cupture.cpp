@@ -86,10 +86,11 @@ void AudioCapture::processAudioData(const float* data, size_t sampleCount) {
         // Handle buffer wrap-around
         if (device->writePos == device->readPos) {
             device->readPos = (device->readPos + 1) % device->circularBuffer.size();
-#if DEBUG_PRINT_AUDIO
-            std::cerr << "Audio buffer overflow! Some samples were dropped." << std::endl;
-#endif
+        #if DEBUG_PRINT_AUDIO
+			std::cerr << "Warning: Audio buffer overflow, overwriting oldest sample." << std::endl;
+        #endif
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds());
     }
 }
 

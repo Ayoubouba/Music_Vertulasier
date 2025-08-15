@@ -18,6 +18,7 @@
     <ClInclude Include="audio_cupture.h" />
     <ClInclude Include="audio_processor.h" />
     <ClInclude Include="config.h" />
+    <ClInclude Include="pinned_buffer.h" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="audio_processor.cu" />

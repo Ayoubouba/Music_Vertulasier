@@ -2,7 +2,7 @@
 
 // Audio Configuration
 #define SAMPLE_RATE         44100
-#define AUDIO_BUFFER_SIZE   1024
+#define AUDIO_BUFFER_SIZE   2048
 #define FFT_SIZE            1024
 
 // Graphics Configuration

@@ -5,6 +5,7 @@
 #include <string>
 #include <atomic>
 #include <SDL2/SDL_stdinc.h>
+#include <cstddef>
 
 class AudioCapture {
 public:

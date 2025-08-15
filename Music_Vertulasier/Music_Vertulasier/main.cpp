@@ -7,7 +7,7 @@
 #include <vector>
 #include "audio_processor.h"
 #include "cuda_runtime.h"
-
+#include <array>
 
 
 class MusicVisualizer {
@@ -90,6 +90,14 @@ void MusicVisualizer::shutdown() {
     if (audioCapture) audioCapture->shutdown();
 #endif
 }
+// CPU reference function for validation
+void cpuAbsGainClamp(const float* in, float* out, int N, float gain) {
+    for (int i = 0; i < N; ++i) {
+        float v = std::fabs(in[i]) * gain;
+        if (v > 1.0f) v = 1.0f;
+        out[i] = v;
+    }
+}
 
 int main() {
     std::cout << "=== CUDA Music Visualizer ===\n";
@@ -107,25 +115,43 @@ int main() {
 
     std::cout << "Program completed successfully!\n";
     // Dummy allocation to check CUDA setup
-	std::cout << "Allocating dummy CUDA memory...\n";
+	std::cout << "cuda testing...\n";
 
     // Create test data
 
         const int bufferSize = 1024;
-        std::vector<float> input(bufferSize, 0.5f); // Fill with 0.5
-        std::vector<float> output(bufferSize, 0.0f);
+        const int N = 4;
+        float input[N] = { -0.2f, 0.0f, 0.5f, 2.0f };
+        float gpuOutput[N];
+        float cpuOutput[N];
 
         AudioProcessor processor(bufferSize);
         if (!processor.initialize()) return 1;
 		std::cout << "AudioProcessor initialized successfully!\n";
-        processor.process(input.data(), output.data(), bufferSize);
 
-        // Verify output now contains 0.5 (copied from input)
-        std::cout << "First 5 output values: ";
-        for (int i = 0; i < 5; i++) {
-            std::cout << output[i] << " "; // Should print "0.5 0.5 0.5 0.5 0.5"
+        processor.setGain(0.5f);
+        processor.process(input,gpuOutput,N);
+        cpuAbsGainClamp(input, cpuOutput, N, 0.5f);
+        // Compare results
+        bool pass = true;
+        for (int i = 0; i < N; ++i) {
+            if (std::fabs(cpuOutput[i] - gpuOutput[i]) > 1e-6) {
+                pass = false;
+            }
+            std::cout << "i=" << i
+                << " in=" << input[i]
+                << " cpu=" << cpuOutput[i]
+                << " gpu=" << gpuOutput[i]
+                << "\n";
         }
-        std::cout << std::endl;
+
+        if (pass) {
+            std::cout << "PASS ? — GPU matches CPU\n";
+        }
+        else {
+            std::cout << "FAIL ? — mismatch found\n";
+        }
+
 
 
     return 0;

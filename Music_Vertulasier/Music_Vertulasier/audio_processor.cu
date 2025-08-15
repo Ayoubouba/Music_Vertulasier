@@ -2,10 +2,16 @@
 #include <cuda_runtime.h>
 #include <iostream>
 
-// 1. First add this kernel definition
-__global__ void copyKernel(float* in, float* out, int N) {
-    int i = threadIdx.x + blockIdx.x * blockDim.x;
-    if (i < N) out[i] = in[i];
+// 1) Kernel: abs + gain + clamp to [-1,1]
+__global__ void processKernelAbsGainClamp(const float* in, float* out, int N, float gain) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i >= N) return;
+
+    float v = in[i];
+    v = fabsf(v) * gain;     // abs + gain
+    // clamp
+    if (v > 1.0f) v = 1.0f;
+    out[i] = v;
 }
 
 AudioProcessor::AudioProcessor(int bufferSize) : bufferSize_(bufferSize) {}
@@ -17,9 +23,21 @@ bool AudioProcessor::initialize() {
 }
 
 void AudioProcessor::process(float* input, float* output, int N) {
-    // 2. Add these three lines for the kernel launch
+    int threads = 256;
+    int blocks = (N + threads - 1) / threads;
+
     cudaMemcpy(d_input_, input, N * sizeof(float), cudaMemcpyHostToDevice);
-    copyKernel << <(N + 255) / 256, 256 >> > (d_input_, d_output_, N);
+
+    // replace copyKernel with the processing kernel
+    processKernelAbsGainClamp << <blocks, threads >> > (d_input_, d_output_, N, gain_);
+
+    // (During bring-up, keep both checks. Later you can remove sync.)
+    cudaError_t kerr = cudaGetLastError();
+    if (kerr != cudaSuccess) {
+        std::cerr << "Kernel launch error: " << cudaGetErrorString(kerr) << "\n";
+    }
+    cudaDeviceSynchronize();
+
     cudaMemcpy(output, d_output_, N * sizeof(float), cudaMemcpyDeviceToHost);
 }
 

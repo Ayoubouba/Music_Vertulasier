@@ -135,20 +135,10 @@ int main() {
     return 0;
 }*/
 
-#include <iostream>
-#include <memory>
-#include <thread>
-#include <vector>
 #include <mutex>
 #include <condition_variable>
-#include <chrono>
 #include <iomanip> // for std::setw
 
-#include "config.h"
-#include "audio_cupture.h"
-#include "audio_processor.h"
-#include "pinned_buffer.h"
-#include "cuda_runtime.h"
 
 // ====================== Circular Buffer ======================
 class AudioCircularBuffer {
